@@ -7,16 +7,34 @@
 
 import SwiftUI
 
-struct ExpenseItem: Identifiable {
+struct ExpenseItem: Identifiable, Codable {
     let name: String
     let type: String
     let amount: Int
     
-    let id = UUID()
+    var id = UUID()
 }
 
 class Expenses: ObservableObject {
-    @Published var items = [ExpenseItem]()
+    @Published var items: [ExpenseItem] {
+        didSet {
+            let encoder = JSONEncoder()
+            if let encoded = try? encoder.encode(items) {
+                UserDefaults.standard.set(encoded, forKey: "Items")
+                print("encoded")
+            }
+        }
+    }
+    
+    init() {
+        if let data = UserDefaults.standard.data(forKey: "Items"),
+           let decoded = try? JSONDecoder().decode([ExpenseItem].self, from: data) {
+            items = decoded
+            print("decoded")
+        } else {
+            items = []
+        }
+    }
 }
 
 struct ContentView: View {
