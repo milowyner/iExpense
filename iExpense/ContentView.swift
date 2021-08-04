@@ -45,7 +45,16 @@ struct ContentView: View {
         NavigationView {
             List {
                 ForEach(expenses.items) { item in
-                    Text(item.name)
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        
+                        Spacer()
+                        Text("$\(item.amount)")
+                    }
                 }
                 .onDelete(perform: removeItems)
             }
@@ -68,6 +77,10 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(expenses: {
+            let expenses = Expenses()
+            expenses.items = [ExpenseItem](repeating: ExpenseItem(name: "Lunch", type: "Business", amount: 20), count: 3)
+            return expenses
+        }())
     }
 }
